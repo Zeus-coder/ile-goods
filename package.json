@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "db:setup": "node --env-file=.env.local scripts/setup-db.mjs",
+    "db:import": "node --env-file=.env.local scripts/import-products.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
