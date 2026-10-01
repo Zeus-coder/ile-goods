@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist), "Helvetica Neue", sans-serif;
+  --font-serif: var(--font-instrument), Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-canvas: #ffffff;
+  --color-bone: #f7f6f3;
+  --color-surface: #fbfbfa;
+  --color-line: #eaeaea;
+  --color-ink: #2f3437;
+  --color-ink-strong: #111111;
+  --color-muted: #787774;
+  --color-press: #333333;
+
+  --color-sage: #edf3ec;
+  --color-sage-ink: #346538;
+  --color-sand: #fbf3db;
+  --color-sand-ink: #956400;
+  --color-rose: #fdebec;
+  --color-rose-ink: #9f2f2d;
+  --color-sky: #e1f3fe;
+  --color-sky-ink: #1f6c9f;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-sand);
+  color: var(--color-ink-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ink-strong);
+  outline-offset: 2px;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 600ms var(--ease-out-soft),
+    transform 600ms var(--ease-out-soft);
+  transition-delay: calc(var(--index, 0) * 80ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
