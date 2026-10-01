@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: Props) {
           <h1 className="mt-4 font-serif text-[clamp(2.2rem,4vw,3.4rem)] leading-[1.08] tracking-[-0.03em] text-ink-strong">
             {product.name}
           </h1>
-          <p className="mt-2 text-muted">Made by {product.maker}</p>
+          <p className="mt-2 text-muted">By {product.maker}</p>
           <p className="mt-6 font-mono text-xl tabular-nums text-ink-strong">{formatNaira(product.price_kobo)}</p>
           <p className="mt-6 text-lg leading-relaxed">{product.description}</p>
 

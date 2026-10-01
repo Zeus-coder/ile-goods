@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 const faqs = [
   {
     q: "How long does delivery take?",
-    a: "Lagos orders usually arrive in 2-3 working days. Everywhere else takes 4-6. You'll get an email with the rider's number the day it leaves our Yaba studio.",
+    a: "Lagos orders usually arrive in 2-3 working days. Everywhere else takes 4-6. You'll get an email with the rider's number the day it leaves our Lagos warehouse.",
   },
   {
     q: "What does delivery cost?",
@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: "What if something arrives broken?",
-    a: "Send us a photo within 7 days and we'll replace it or refund you in full. Ceramics are packed in shredded paper and double-boxed, so this is rare.",
+    a: "Send us a photo within 7 days and we'll replace it or refund you in full. Glass and fragile pieces are packed in shredded paper and double-boxed, so this is rare.",
   },
   {
     q: "Do I need an account?",
@@ -48,7 +48,7 @@ function ProductCard({ product, featured }: { product: Product; featured?: boole
       <div className="mt-3 flex items-start justify-between gap-3">
         <div>
           <p className="font-medium text-ink-strong">{product.name}</p>
-          <p className="text-sm text-muted">{product.maker}</p>
+          <p className="text-sm text-muted">{product.category}</p>
         </div>
         <p className="shrink-0 font-mono text-sm tabular-nums text-ink">{formatNaira(product.price_kobo)}</p>
       </div>
@@ -57,13 +57,20 @@ function ProductCard({ product, featured }: { product: Product; featured?: boole
   );
 }
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ category?: string | string[] }> }) {
   const products = await listProducts();
-  const [featured, ...rest] = products;
-  const makerCount = new Set(products.map((p) => p.maker)).size;
+  // First product of each category, in catalogue order; doubles as the hero picks and room cards.
+  const rooms = [...new Map(products.map((p) => [p.category, p])).values()].map((cover) => ({
+    cover,
+    count: products.filter((p) => p.category === cover.category).length,
+  }));
+  const heroPicks = rooms.map((r) => r.cover).slice(0, 3);
+
+  const requested = (await searchParams).category;
+  const active = rooms.some((r) => r.cover.category === requested) ? (requested as string) : null;
+  const shown = active ? products.filter((p) => p.category === active) : products;
+  const [featured, ...rest] = shown;
   const inStock = products.reduce((sum, p) => sum + p.stock, 0);
-  const makers = [...new Map(products.map((p) => [p.maker, p])).values()];
-  const heroPicks = products.slice(0, 3);
 
   return (
     <>
@@ -75,12 +82,12 @@ export default async function HomePage() {
         />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 md:grid-cols-[1.1fr_1fr] md:pb-28 md:pt-20">
           <Reveal>
-            <p className="text-sm uppercase tracking-[0.08em] text-muted">Homeware from Nigerian studios</p>
+            <p className="text-sm uppercase tracking-[0.08em] text-muted">Homeware, delivered across Nigeria</p>
             <h1 className="mt-5 font-serif text-[clamp(2.6rem,6vw,4.6rem)] leading-[1.05] tracking-[-0.03em] text-ink-strong">
-              Things for the house, made by people you can name.
+              Good things for every room in the house.
             </h1>
             <p className="mt-6 max-w-md text-lg text-muted">
-              Adire throws, stoneware, raffia and Jos coffee. Small batches from independent studios, delivered to all 36 states and Abuja.
+              Lamps and planters, beds and sofas, and the kitchen tools you reach for every day. Priced in naira and delivered to all 36 states and Abuja.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-4">
               <a
@@ -116,15 +123,31 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
           <Reveal className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="font-serif text-4xl tracking-[-0.02em] text-ink-strong md:text-5xl">The collection</h2>
+              <h2 className="font-serif text-4xl tracking-[-0.02em] text-ink-strong md:text-5xl">{active ?? "The collection"}</h2>
               <p className="mt-3 max-w-lg text-muted">
-                Every piece is made in batches of fewer than 80. When a batch sells out, it's gone until the maker finishes the next.
+                A short list for each room, chosen to be used every day. Everything shown is in stock and ships from Lagos.
               </p>
             </div>
-            <p className="font-mono text-sm text-muted">{products.length} pieces</p>
+            <p className="font-mono text-sm text-muted">{shown.length} pieces</p>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-4">
+          <nav aria-label="Filter by category" className="mt-8 flex flex-wrap gap-2">
+            {[null, ...rooms.map((r) => r.cover.category)].map((c) => (
+              <Link
+                key={c ?? "all"}
+                href={c ? `/?category=${encodeURIComponent(c)}#shop` : "/#shop"}
+                scroll={false}
+                aria-current={c === active ? "page" : undefined}
+                className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                  c === active ? "border-ink-strong bg-ink-strong text-white" : "border-line bg-white text-ink hover:border-muted"
+                }`}
+              >
+                {c ?? "All"}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-4">
             {featured && (
               <Reveal className="col-span-2 md:row-span-2">
                 <ProductCard product={featured} featured />
@@ -139,35 +162,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="makers" className="scroll-mt-20">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-28 sm:px-6 md:grid-cols-2">
-          <Reveal className="rounded-xl border border-line bg-surface p-6 sm:p-8">
-            <h3 className="text-sm uppercase tracking-[0.08em] text-muted">The studios</h3>
-            <ul className="mt-4">
-              {makers.map((p) => (
-                <li key={p.maker} className="flex items-baseline justify-between gap-4 border-b border-line py-3 last:border-0">
-                  <span className="text-ink-strong">{p.maker}</span>
-                  <span className="shrink-0 text-sm text-muted">{p.category}</span>
-                </li>
-              ))}
-            </ul>
+      <section id="rooms" className="scroll-mt-20">
+        <div className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
+          <Reveal className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="font-serif text-4xl tracking-[-0.02em] text-ink-strong md:text-5xl">Shop by room</h2>
+              <p className="mt-3 max-w-lg text-muted">
+                {inStock.toLocaleString("en-NG")} pieces in stock today across {rooms.length} rooms.
+              </p>
+            </div>
           </Reveal>
-          <Reveal index={1}>
-            <h2 className="font-serif text-4xl tracking-[-0.02em] text-ink-strong md:text-5xl">We pay makers first</h2>
-            <p className="mt-5 text-lg text-muted">
-              Most shops take stock on credit and pay studios months later. We buy every batch outright, at the price the maker sets, before it goes on this page.
-            </p>
-            <dl className="mt-10 grid grid-cols-2 gap-6">
-              <div className="rounded-xl border border-line bg-white p-6">
-                <dt className="text-sm text-muted">Studios we buy from</dt>
-                <dd className="mt-1 font-serif text-4xl text-ink-strong">{makerCount}</dd>
-              </div>
-              <div className="rounded-xl border border-line bg-white p-6">
-                <dt className="text-sm text-muted">Pieces in stock today</dt>
-                <dd className="mt-1 font-serif text-4xl text-ink-strong">{inStock}</dd>
-              </div>
-            </dl>
-          </Reveal>
+          <div className="mt-12 grid gap-5 sm:grid-cols-3">
+            {rooms.map(({ cover, count }, i) => (
+              <Reveal key={cover.category} index={i + 1}>
+                <Link href={`/?category=${encodeURIComponent(cover.category)}#shop`} scroll={false} className="group block">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-line bg-bone">
+                    <ProductImage src={cover.image_url} alt="" category={cover.category} sizes="(min-width: 640px) 33vw, 100vw"
+                      className="transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]" />
+                  </div>
+                  <div className="mt-3 flex items-baseline justify-between gap-3">
+                    <p className="flex items-center gap-2 font-medium text-ink-strong">
+                      {cover.category}
+                      <ArrowRightIcon size={16} weight="bold" className="transition-transform group-hover:translate-x-0.5" />
+                    </p>
+                    <p className="font-mono text-sm text-muted">{count} pieces</p>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 

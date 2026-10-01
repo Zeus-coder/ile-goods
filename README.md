@@ -11,7 +11,8 @@ A small online shop: product catalogue, a cart saved in the database, guest or G
 
 ```bash
 npm install
-npm run db:setup   # creates tables and seeds products (safe to re-run)
+npm run db:setup   # creates tables (safe to re-run)
+npm run db:import  # loads the product catalogue (safe to re-run)
 npm run dev        # http://localhost:3000
 ```
 
@@ -32,7 +33,7 @@ Sign-in is optional for buying. Signed-in shoppers get their email pre-filled an
 
 ## Mailgun
 
-The sandbox domain only delivers to **authorized recipients** (Mailgun dashboard > Sending > Overview > Authorized recipients). Add any address you want to test with, or verify your own domain and update `MAILGUN_DOMAIN` / `MAILGUN_FROM`.
+Emails send from the verified domain `ile-goods.usezana.app`, so they reach any address. A Mailgun sandbox domain would only deliver to **authorized recipients** (Mailgun dashboard > Sending > Overview > Authorized recipients).
 
 If an email fails, the order is still saved and the confirmation page says the email didn't go out.
 
@@ -40,9 +41,11 @@ If an email fails, the order is still saved and the confirmation page says the e
 
 Checkout offers *pay on delivery* and *bank transfer*. No card details are collected. Hooking up Paystack or Flutterwave would be the next step for online card payments.
 
-## Product photos
+## Products
 
-The seeded products have no real photos yet, so the shop shows a coloured tile per category. Set `products.image_url` to a real image URL (for example, uploaded to the `hnglesson2` Neon bucket declared in `neon.ts`) and the photo replaces the tile everywhere.
+The catalogue comes from [DummyJSON](https://dummyjson.com/docs/products), a free product API with real photos. `npm run db:import` pulls its decor, furniture and kitchen products into Neon, converting dollar prices to naira at ₦1,500/$ rounded to the nearest ₦500. Re-running it updates the same rows by slug.
+
+Products are ordinary rows in the `products` table, so you can add or edit them directly. A product without a usable `image_url` shows a coloured category tile instead of a photo.
 
 ## Neon
 

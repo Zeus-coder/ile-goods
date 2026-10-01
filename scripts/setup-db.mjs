@@ -1,4 +1,4 @@
-// Creates the Better Auth tables, the shop tables, and seeds the catalogue.
+// Creates the Better Auth tables and the shop tables. Products come from `npm run db:import`.
 // Safe to run more than once.
 import pg from "pg";
 import { getMigrations } from "better-auth/db/migration";
@@ -78,36 +78,6 @@ await pool.query(`
 `);
 console.log("Shop tables: ready");
 
-const products = [
-  ["adire-indigo-throw", "Adire indigo throw", "Textiles", "Mama Ronke's studio, Abeokuta",
-    "Hand-dyed cotton throw using the oniko tie-resist method. Each one comes out a little different. 130 x 180 cm, machine wash cold.", 4850000, 14],
-  ["stoneware-mug-pair", "Stoneware mugs, set of two", "Ceramics", "Kiln House, Ilorin",
-    "Thick-walled mugs with a speckled oat glaze. Holds 340 ml, keeps tea hot through a long call. Dishwasher safe.", 1800000, 32],
-  ["clay-water-pot", "Clay water pot", "Ceramics", "Dada Pottery, Ọ̀yọ́",
-    "Unglazed terracotta pot that keeps water cool the old way. 9 litre capacity with a fitted lid and wooden stand.", 3200000, 6],
-  ["shea-vetiver-candle", "Shea and vetiver candle", "Home fragrance", "Ewà Candle Co., Lagos",
-    "Shea and soy wax blend poured into a reusable amber jar. Earthy vetiver with a little lime. Around 45 hours of burn time.", 1450000, 40],
-  ["raffia-basket-large", "Raffia storage basket, large", "Storage", "Weavers' collective, Ìsẹ́yìn",
-    "Tightly woven raffia with leather handles. Fits two bath towels or a week of laundry. 40 cm across, 35 cm tall.", 2650000, 18],
-  ["jos-plateau-coffee", "Jos Plateau coffee, 340 g", "Pantry", "Highland Roasters, Jos",
-    "Single-origin arabica, medium roast. Notes of cocoa, dates and a bit of citrus. Whole bean, roasted to order every Monday.", 1180000, 55],
-  ["aso-oke-table-runner", "Aso-oke table runner", "Textiles", "Ìṣẹ́yìn loom workshop",
-    "Strip-woven aso-oke in charcoal and gold thread. 35 x 180 cm, dry clean or gentle hand wash.", 2200000, 11],
-  ["iroko-serving-board", "Iroko serving board", "Kitchen", "Ọmọ Igi Woodworks, Ibadan",
-    "Cut from reclaimed iroko and finished with food-safe oil. 50 x 22 cm with a carved handle. Oil it once a month.", 2950000, 9],
-  ["black-soap-shea-duo", "Black soap and shea bar duo", "Bath", "Àdùn Naturals, Ọ̀ṣogbo",
-    "Traditional dudu-osun black soap with an unrefined shea butter bar. No added fragrance, wrapped in kraft paper.", 740000, 70],
-];
-
-for (const [slug, name, category, maker, description, price, stock] of products) {
-  await pool.query(
-    `insert into products (slug, name, category, maker, description, price_kobo, image_url, stock)
-     values ($1, $2, $3, $4, $5, $6, $7, $8)
-     on conflict (slug) do nothing`,
-    [slug, name, category, maker, description, price, `https://picsum.photos/seed/ile-${slug}/900/1100`, stock],
-  );
-}
-const { rows } = await pool.query("select count(*)::int as n from products");
-console.log(`Products: ${rows[0].n} in catalogue`);
+console.log("Next: run `npm run db:import` to load the catalogue.");
 
 await pool.end();

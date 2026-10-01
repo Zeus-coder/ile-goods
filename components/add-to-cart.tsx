@@ -12,7 +12,7 @@ export function AddToCart({ productId, stock }: { productId: number; stock: numb
   const [pending, startTransition] = useTransition();
 
   if (stock === 0) {
-    return <p className="rounded-md bg-bone px-4 py-3 text-muted">Sold out. The maker is working on the next batch.</p>;
+    return <p className="rounded-md bg-bone px-4 py-3 text-muted">Sold out. We're restocking soon.</p>;
   }
 
   return (
@@ -42,7 +42,7 @@ export function AddToCart({ productId, stock }: { productId: number; stock: numb
           </Link>
         </p>
       )}
-      {stock <= 5 && <p className="text-sm text-sand-ink">Only {stock} left in this batch.</p>}
+      {stock <= 5 && <p className="text-sm text-sand-ink">Only {stock} left in stock.</p>}
     </div>
   );
 }

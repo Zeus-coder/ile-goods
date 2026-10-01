@@ -8,7 +8,7 @@ const instrument = Instrument_Serif({ subsets: ["latin"], weight: "400", style: 
 
 export const metadata: Metadata = {
   title: { default: "Ilé Goods", template: "%s | Ilé Goods" },
-  description: "Homeware made by small Nigerian studios, delivered across the country.",
+  description: "Decor, furniture and kitchen pieces for every room, delivered across Nigeria.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -7,7 +7,7 @@ export function SiteFooter() {
         <div>
           <p className="font-serif text-2xl text-ink-strong">Ilé Goods</p>
           <p className="mt-3 max-w-sm text-muted">
-            Homeware from small studios in Abeokuta, Ìsẹ́yìn, Jos and Lagos. We pay makers before we sell.
+            Decor, furniture and kitchen pieces for every room, delivered from Lagos to all 36 states and Abuja.
           </p>
         </div>
         <div className="text-[15px]">
