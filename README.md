@@ -47,6 +47,31 @@ The catalogue comes from [DummyJSON](https://dummyjson.com/docs/products), a fre
 
 Products are ordinary rows in the `products` table, so you can add or edit them directly. A product without a usable `image_url` shows a coloured category tile instead of a photo.
 
+## Android app (`mobile/`)
+
+An Expo (React Native) app that shares accounts and the cart with the website.
+
+- **Same account**: the app signs in with Google through this site's Better Auth server (Expo plugin, `ilegoods://` scheme), so no extra Google client is needed.
+- **Same cart**: a signed-in user's cart is stored against their account, not the browser. The website and the app both read and write it, so items added on one show up on the other. A guest cart is merged into the account cart on sign-in.
+- **API used by the app**: `GET /api/products`, and `GET`/`POST`/`PATCH /api/cart` (session cookie required).
+
+```bash
+cd mobile
+npm install
+npx expo run:android            # dev build on a connected device or emulator
+```
+
+Build an installable APK locally (Java 17 and the Android SDK required):
+
+```bash
+cd mobile
+npx expo prebuild -p android
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+# → android/app/build/outputs/apk/release/app-release.apk
+```
+
+The app talks to `https://ile-goods.netlify.app` by default; set `EXPO_PUBLIC_API_URL` to point it elsewhere.
+
 ## Neon
 
 ```bash

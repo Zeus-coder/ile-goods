@@ -11,3 +11,6 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# Built APKs (upload to Drive, never commit)
+release/
