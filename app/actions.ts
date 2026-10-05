@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { ensureCartId, readCartId } from "@/lib/cart";
+import { addItem, currentCartId, ensureCartId, setItemQuantity } from "@/lib/cart";
 import { checkoutSchema, type CheckoutField } from "@/lib/checkout-schema";
 import { query, withTransaction } from "@/lib/db";
 import { sendOrderConfirmation } from "@/lib/mail";
@@ -13,31 +13,14 @@ import { priceBreakdown } from "@/lib/money";
 import type { Order, OrderItem } from "@/lib/orders";
 
 export async function addToCart(productId: number, quantity = 1) {
-  const cartId = await ensureCartId();
-  await query(
-    `insert into cart_items (cart_id, product_id, quantity)
-     select $1, p.id, least($3, p.stock) from products p where p.id = $2 and p.stock > 0
-     on conflict (cart_id, product_id)
-     do update set quantity = least(cart_items.quantity + excluded.quantity,
-                                    (select stock from products where id = $2))`,
-    [cartId, productId, Math.max(1, Math.floor(quantity))],
-  );
-  await query("update carts set updated_at = now() where id = $1", [cartId]);
+  await addItem(await ensureCartId(), productId, quantity);
   revalidatePath("/", "layout");
 }
 
 export async function setCartQuantity(productId: number, quantity: number) {
-  const cartId = await readCartId();
+  const cartId = await currentCartId();
   if (!cartId) return;
-  if (quantity <= 0) {
-    await query("delete from cart_items where cart_id = $1 and product_id = $2", [cartId, productId]);
-  } else {
-    await query(
-      `update cart_items set quantity = least($3, (select stock from products where id = $2))
-       where cart_id = $1 and product_id = $2`,
-      [cartId, productId, Math.floor(quantity)],
-    );
-  }
+  await setItemQuantity(cartId, productId, quantity);
   revalidatePath("/", "layout");
 }
 
@@ -71,7 +54,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   }
   const data = parsed.data;
 
-  const cartId = await readCartId();
+  const cartId = await currentCartId();
   if (!cartId) return { formError: "Your bag is empty. Add something before checking out.", values };
 
   const session = await getSession();

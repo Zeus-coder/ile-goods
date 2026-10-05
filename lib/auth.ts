@@ -1,3 +1,4 @@
+import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { headers } from "next/headers";
@@ -16,7 +17,9 @@ export const auth = betterAuth({
         },
       }
     : {},
-  plugins: [nextCookies()],
+  // The Android app (mobile/) signs in through this server and comes back via its ilegoods:// scheme.
+  trustedOrigins: ["ilegoods://", ...(process.env.NODE_ENV === "development" ? ["exp://", "exp://**"] : [])],
+  plugins: [expo(), nextCookies()],
 });
 
 export async function getSession() {
