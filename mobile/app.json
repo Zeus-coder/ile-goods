@@ -9,10 +9,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.usezana.ilegoods"
+      "bundleIdentifier": "com.ilegoods.app"
     },
     "android": {
-      "package": "app.usezana.ilegoods",
+      "package": "com.ilegoods.app",
       "adaptiveIcon": {
         "backgroundColor": "#111111",
         "foregroundImage": "./assets/android-icon-foreground.png",

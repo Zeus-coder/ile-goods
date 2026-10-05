@@ -66,7 +66,8 @@ Build an installable APK locally (Java 17 and the Android SDK required):
 ```bash
 cd mobile
 npx expo prebuild -p android
-cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a,x86_64
+# arm64-v8a / armeabi-v7a: physical phones. x86_64: the Android emulator on an Intel Mac.
 # → android/app/build/outputs/apk/release/app-release.apk
 ```
 
